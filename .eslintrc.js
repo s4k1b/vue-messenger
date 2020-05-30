@@ -1,11 +1,17 @@
 module.exports = {
   root: true,
   env: {
+    browser: true,
     node: true,
   },
   extends: [
     'plugin:vue/essential',
-    '@vue/airbnb',
+    'prettier',
+    'prettier/vue',
+    'plugin:prettier/recommended',
+  ],
+  plugins: [
+    'prettier'
   ],
   parserOptions: {
     parser: 'babel-eslint',
