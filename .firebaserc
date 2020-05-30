@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "vue-fcm-messenger"
+  },
+  "targets": {
+    "vue-messenger-38447": {
+      "hosting": {
+        "messenger": [
+          "vue-fcm-messenger"
+        ]
+      }
+    }
+  }
+}
