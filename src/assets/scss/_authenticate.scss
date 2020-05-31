@@ -1,0 +1,16 @@
+.authenticate-wrapper {
+  background-color: #fff;
+  width: 50vw;
+  height: 70vh;
+  border-radius: 4px;
+  box-shadow: 2px 2px 20px 0 grey;
+
+  .sign-in-btn {
+    border: none;
+    padding: 20px 10px;
+    background-color: #35485e;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 24px;
+  }
+}

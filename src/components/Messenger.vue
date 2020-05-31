@@ -3,13 +3,8 @@
     <div id="sidepanel">
       <div id="profile">
         <div class="wrap">
-          <img
-            id="profile-img"
-            src="http://emilcarlsson.se/assets/mikeross.png"
-            class="online"
-            alt=""
-          />
-          <p>Mike Ross</p>
+          <img id="profile-img" :src="userData.photoURL" class="online" alt="" />
+          <p>{{ userData.displayName }}</p>
           <i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
           <div id="status-options">
             <ul>
@@ -225,3 +220,16 @@
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex';
+
+export default {
+  computed: {
+    ...mapGetters({ user: 'user' }),
+    userData() {
+      return this.user.data || {};
+    },
+  },
+};
+</script>
