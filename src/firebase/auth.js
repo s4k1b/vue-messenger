@@ -1,5 +1,6 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
+import { setUserData } from './database';
 import store from '@/store';
 
 async function googleAuth() {
@@ -8,9 +9,11 @@ async function googleAuth() {
   provider.addScope('email');
 
   try {
-    await firebase.auth().signInWithPopup(provider);
+    const result = await firebase.auth().signInWithPopup(provider);
 
     // save user to database
+    const user = result.user;
+    setUserData(user.uid, user.email, user.displayName, user.photoURL);
   } catch (e) {
     throw e.message;
   }
