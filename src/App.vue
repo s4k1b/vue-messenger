@@ -7,8 +7,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { currentUserState } from '@/firebase/auth.js';
 
 export default {
   name: 'App',
@@ -19,6 +18,11 @@ export default {
 
   computed: {
     ...mapGetters({ user: 'user' }),
+  },
+
+  beforeCreate() {
+    // get and set current user state
+    currentUserState();
   },
 };
 </script>

@@ -7,7 +7,6 @@ export default new Vuex.Store({
   state: {
     user: {
       loggedIn: false,
-      token: '',
       data: {},
     },
   },
@@ -17,6 +16,9 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    user$set(state, user) {
+      state.user = user;
+    },
     user$login(state, { user, token }) {
       state.user.loggedIn = true;
       state.user.data = user;
