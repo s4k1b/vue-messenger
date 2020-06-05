@@ -8,4 +8,23 @@ function setUserData(userId, email, name, imageUrl) {
     .set({ uid: userId, email, name, imageUrl });
 }
 
-export { setUserData };
+async function users$read() {
+  return await firebase.database().ref('/users').once('value');
+}
+
+async function user$read(userId) {
+  return await firebase.database().ref(`/users/${userId}`).once('value');
+}
+
+function contacts$write(userId, contactId) {
+  firebase
+    .database()
+    .ref('users/' + userId + '/contacts/' + contactId)
+    .set(true);
+}
+
+async function contactList$read(userId) {
+  return await firebase.database().ref(`/users/${userId}/contacts`).once('value');
+}
+
+export { setUserData, users$read, user$read, contacts$write, contactList$read };
