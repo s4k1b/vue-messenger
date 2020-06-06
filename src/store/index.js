@@ -56,7 +56,7 @@ export default new Vuex.Store({
 
         commit('allUsers$set', Object.values(users));
       } catch (e) {
-        console.log(e.message);
+        Vue.toasted.error(e && e.message);
       }
     },
 
@@ -77,7 +77,7 @@ export default new Vuex.Store({
           contactsWithInfo.map((contact) => contact.val())
         );
       } catch (e) {
-        console.log(e.message);
+        Vue.toasted.error(e && e.message);
       }
     },
   },

@@ -19,6 +19,14 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+import Toasted from 'vue-toasted';
+Vue.use(Toasted, {
+  position: 'bottom-right',
+  duration: 2500,
+  theme: 'bubble',
+  iconPack: 'fontawesome',
+});
+
 new Vue({
   store,
   render: (h) => h(App),

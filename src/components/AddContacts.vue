@@ -65,10 +65,16 @@ export default {
   },
 
   methods: {
-    ...mapActions({ allUsers$fetch: 'allUsers$fetch' }),
+    ...mapActions({ allUsers$fetch: 'allUsers$fetch', contacts$fetch: 'contacts$fetch' }),
 
     addContact(contactId) {
-      contacts$write(this.userData.uid, contactId);
+      try {
+        contacts$write(this.userData.uid, contactId);
+        this.contacts$fetch({ userId: this.userData.uid });
+        this.$toasted.info('Contact added successfully');
+      } catch (e) {
+        this.$toasted.error(e && e.message);
+      }
     },
   },
 };
