@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { users$read, user$read, contactList$read } from '@/firebase/database.js';
+import { users$read, user$read, contactList$read, messages$read } from '@/firebase/database.js';
 
 Vue.use(Vuex);
 
@@ -15,6 +15,7 @@ export default new Vuex.Store({
     contacts: [],
 
     activeChat: {},
+    messages: [],
   },
   getters: {
     user(state) {
@@ -30,6 +31,9 @@ export default new Vuex.Store({
 
     activeChat(state) {
       return state.activeChat || {};
+    },
+    messages(state) {
+      return state.messages || [];
     },
   },
   mutations: {
@@ -56,6 +60,9 @@ export default new Vuex.Store({
 
     activeChat$set(state, activeChat) {
       state.activeChat = activeChat;
+    },
+    messages$set(state, messages) {
+      state.messages = messages;
     },
   },
   actions: {
@@ -86,6 +93,16 @@ export default new Vuex.Store({
           'contacts$set',
           contactsWithInfo.map((contact) => contact.val())
         );
+      } catch (e) {
+        Vue.toasted.error(e && e.message);
+      }
+    },
+
+    async messages$fetch({ commit }, { userId, contactId }) {
+      try {
+        const messagesSnapshot = await messages$read(userId, contactId);
+        const messagesObj = messagesSnapshot.val();
+        commit('messages$set', (messagesObj && Object.values(messagesObj)) || []);
       } catch (e) {
         Vue.toasted.error(e && e.message);
       }

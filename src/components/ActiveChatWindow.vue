@@ -11,51 +11,21 @@
     </div>
     <div class="messages">
       <ul>
-        <li class="sent">
-          <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
+        <li :class="getClass(message)" v-for="message in messages" :key="message.time">
+          <img :src="getImageUrl(message)" alt="" />
           <p>
-            How the hell am I supposed to get a jury to believe you when I am not even sure that I
-            do?!
-          </p>
-        </li>
-        <li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-          <p>When you're backed against the wall, break the god damn thing down.</p>
-        </li>
-        <li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-          <p>Excuses don't win championships.</p>
-        </li>
-        <li class="sent">
-          <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
-          <p>Oh yeah, did Michael Jordan tell you that?</p>
-        </li>
-        <li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-          <p>No, I told him that.</p>
-        </li>
-        <li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-          <p>What are your choices when someone puts a gun to your head?</p>
-        </li>
-        <li class="sent">
-          <img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
-          <p>What are you talking about? You do what they say or they shoot you.</p>
-        </li>
-        <li class="replies">
-          <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-          <p>
-            Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you
-            do any one of a hundred and forty six other things.
+            {{ message.message }}
           </p>
         </li>
       </ul>
     </div>
     <div class="message-input">
       <div class="wrap">
-        <input type="text" placeholder="Write your message..." />
+        <input v-model="message" type="text" placeholder="Write your message..." />
         <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
-        <button class="submit"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+        <button class="submit">
+          <i class="fa fa-paper-plane" aria-hidden="true" @click.prevent="sendMessege"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -63,9 +33,67 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { messages$write, messages$on, messages$off } from '@/firebase/database.js';
+
 export default {
+  data() {
+    return { message: '' };
+  },
+
   computed: {
-    ...mapGetters({ user: 'user', activeChat: 'activeChat' }),
+    ...mapGetters({ user: 'user', activeChat: 'activeChat', messages: 'messages' }),
+    senderImageUrl() {
+      return this.user.data && this.user.data.photoURL;
+    },
+    senderId() {
+      return this.user.data && this.user.data.uid;
+    },
+    receiverId() {
+      return this.activeChat.uid;
+    },
+  },
+
+  methods: {
+    sendMessege() {
+      const date = new Date();
+      const time = date.getTime();
+      messages$write(this.senderId, this.receiverId, this.message, time);
+      this.message = '';
+    },
+
+    getTypeOfMessage(m) {
+      if (m.senderId === this.senderId) return 'sender';
+      else return 'receiver';
+    },
+    getClass(m) {
+      const type = this.getTypeOfMessage(m);
+
+      if (type === 'sender') return 'sent';
+      else return 'replies';
+    },
+    getImageUrl(m) {
+      const type = this.getTypeOfMessage(m);
+
+      if (type === 'sender') return this.senderImageUrl;
+      else return this.activeChat.imageUrl;
+    },
+  },
+
+  watch: {
+    activeChat: {
+      deep: true,
+      immediate: true,
+      handler(n, o) {
+        if (o) {
+          // remove old listener
+          messages$off();
+        }
+
+        if (Object.keys(n).length)
+          // first attatch event listener
+          messages$on('child_added', this.senderId, n.uid);
+      },
+    },
   },
 };
 </script>
