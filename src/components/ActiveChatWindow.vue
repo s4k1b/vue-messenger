@@ -1,8 +1,8 @@
 <template>
   <div class="content">
     <div class="contact-profile">
-      <img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
-      <p>Harvey Specter</p>
+      <img :src="activeChat.imageUrl" alt="" />
+      <p>{{ activeChat.name }}</p>
       <div class="social-media">
         <i class="fa fa-facebook" aria-hidden="true"></i>
         <i class="fa fa-twitter" aria-hidden="true"></i>
@@ -60,3 +60,12 @@
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex';
+export default {
+  computed: {
+    ...mapGetters({ user: 'user', activeChat: 'activeChat' }),
+  },
+};
+</script>

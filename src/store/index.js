@@ -13,6 +13,8 @@ export default new Vuex.Store({
 
     allUsers: [],
     contacts: [],
+
+    activeChat: {},
   },
   getters: {
     user(state) {
@@ -24,6 +26,10 @@ export default new Vuex.Store({
     },
     contacts(state) {
       return state.contacts || [];
+    },
+
+    activeChat(state) {
+      return state.activeChat || {};
     },
   },
   mutations: {
@@ -46,6 +52,10 @@ export default new Vuex.Store({
     },
     contacts$set(state, contacts) {
       state.contacts = contacts;
+    },
+
+    activeChat$set(state, activeChat) {
+      state.activeChat = activeChat;
     },
   },
   actions: {

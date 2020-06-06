@@ -6,7 +6,13 @@
     </div>
     <div id="contacts">
       <ul>
-        <li class="contact" v-for="contact in filteredContacts" :key="contact.uid">
+        <li
+          class="contact"
+          :class="{ active: activeChat.uid === contact.uid }"
+          v-for="contact in filteredContacts"
+          :key="contact.uid"
+          @click.prevent="setActiveChat(contact)"
+        >
           <div class="wrap">
             <!-- <span class="contact-status online"></span> -->
             <img :src="contact.imageUrl" alt="" />
@@ -30,7 +36,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ user: 'user', contacts: 'contacts' }),
+    ...mapGetters({ user: 'user', contacts: 'contacts', activeChat: 'activeChat' }),
     userData() {
       return this.user.data || {};
     },
@@ -51,6 +57,9 @@ export default {
 
   methods: {
     ...mapActions({ contacts$fetch: 'contacts$fetch' }),
+    setActiveChat(contact) {
+      this.$store.commit('activeChat$set', contact);
+    },
   },
 };
 </script>

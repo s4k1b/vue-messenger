@@ -11,6 +11,14 @@ body {
 
 @import "./authenticate";
 
+p {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+}
+
 
 #frame {
   width: 95%;
@@ -86,7 +94,7 @@ body {
   }
 }
 #frame #sidepanel #profile .wrap img {
-  width: 50px;
+  width: 60px;
   border-radius: 50%;
   padding: 3px;
   border: 2px solid #e74c3c;
@@ -119,6 +127,7 @@ body {
 #frame #sidepanel #profile .wrap p {
   float: left;
   margin-left: 15px;
+  margin-bottom: 0;
 }
 @media screen and (max-width: 735px) {
   #frame #sidepanel #profile .wrap p {
@@ -305,6 +314,7 @@ body {
   border: none;
   background: #32465a;
   color: #f5f5f5;
+  font-size: 14px;
 }
 #frame #sidepanel #search input:focus {
   outline: none;
@@ -418,11 +428,14 @@ body {
 }
 #frame #sidepanel #contacts ul li.contact .wrap .meta .name {
   font-weight: 600;
+  margin-bottom: 0;
+  font-size: 12px;
 }
 #frame #sidepanel #contacts ul li.contact .wrap .meta .preview {
   margin: 5px 0 0 0;
   padding: 0 0 1px;
   font-weight: 400;
+  font-size: 11px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -603,6 +616,7 @@ body {
   bottom: 0;
   width: 100%;
   z-index: 99;
+  background-color: #ddd;
 }
 #frame .content .message-input .wrap {
   position: relative;
@@ -625,9 +639,9 @@ body {
 }
 #frame .content .message-input .wrap .attachment {
   position: absolute;
-  right: 60px;
+  right: 62px;
   z-index: 4;
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 1.1em;
   color: #435f7a;
   opacity: .5;
@@ -646,7 +660,7 @@ body {
   float: right;
   border: none;
   width: 50px;
-  padding: 12px 0;
+  padding: 8px 0;
   cursor: pointer;
   background: #32465a;
   color: #f5f5f5;
