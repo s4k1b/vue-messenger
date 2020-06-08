@@ -552,7 +552,7 @@ ul {
 }
 #frame .content .messages {
   height: auto;
-  width: 50vw;
+  min-width: 550px;
   min-height: calc(100% - 93px);
   max-height: calc(100% - 93px);
   overflow-y: scroll;
