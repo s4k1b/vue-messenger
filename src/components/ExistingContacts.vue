@@ -51,7 +51,7 @@ export default {
     },
   },
 
-  created() {
+  async created() {
     this.contacts$fetch({ userId: this.userData.uid });
   },
 

@@ -5,7 +5,7 @@ import Store from '@/store';
 function setUserData(userId, email, name, imageUrl) {
   firebase
     .database()
-    .ref('users/' + userId)
+    .ref('users/' + userId + '/info')
     .set({ uid: userId, email, name, imageUrl });
 }
 
@@ -14,18 +14,29 @@ async function users$read() {
 }
 
 async function user$read(userId) {
-  return await firebase.database().ref(`/users/${userId}`).once('value');
+  return await firebase.database().ref(`/users/${userId}/info`).once('value');
 }
 
 function contacts$write(userId, contactId) {
   firebase
     .database()
-    .ref('users/' + userId + '/contacts/' + contactId)
+    .ref('users/' + userId + '/contacts/' + contactId + '/status')
     .set(true);
 }
 
 async function contactList$read(userId) {
   return await firebase.database().ref(`/users/${userId}/contacts`).once('value');
+}
+
+function lastContacted$write(userId, contactId, verdict) {
+  firebase.database().ref(`users/${userId}/contacts/${contactId}/lastContacted`).set(verdict);
+}
+
+async function lastContacted$read(userId, contactId) {
+  return await firebase
+    .database()
+    .ref(`users/${userId}/contacts/${contactId}/lastContacted`)
+    .once('value');
 }
 
 function messages$write(senderId, receiverId, message, time) {
@@ -69,6 +80,8 @@ export {
   user$read,
   contacts$write,
   contactList$read,
+  lastContacted$write,
+  lastContacted$read,
   messages$write,
   messages$read,
   messages$on,

@@ -1,6 +1,12 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { users$read, user$read, contactList$read, messages$read } from '@/firebase/database.js';
+import {
+  users$read,
+  user$read,
+  contactList$read,
+  lastContacted$read,
+  messages$read,
+} from '@/firebase/database.js';
 
 Vue.use(Vuex);
 
@@ -71,9 +77,12 @@ export default new Vuex.Store({
         const snapshot = await users$read();
         const users = snapshot.val();
 
-        commit('allUsers$set', Object.values(users));
+        commit(
+          'allUsers$set',
+          Object.keys(users).map((key) => users[key].info)
+        );
       } catch (e) {
-        Vue.toasted.error(e && e.message);
+        Vue.toasted.error(`Failed fetching all users: ${e && e.message}`);
       }
     },
 
@@ -83,7 +92,7 @@ export default new Vuex.Store({
         const contacts = contactsSnapShot.val();
 
         const promiseList = Object.keys(contacts)
-          .filter((contactKey) => contacts[contactKey])
+          .filter((contactKey) => contacts[contactKey].status)
           .map((contactKey) => {
             return user$read(contactKey);
           });
@@ -94,8 +103,19 @@ export default new Vuex.Store({
           contactsWithInfo.map((contact) => contact.val())
         );
       } catch (e) {
-        Vue.toasted.error(e && e.message);
+        commit('contacts$set', []);
+        Vue.toasted.info(
+          'Your contact list is empty, please click the Add Contacts button to add contacts'
+        );
       }
+    },
+
+    async lastContacted$fetch({ commit }, { userId, contacts }) {
+      const promiseList = Object.keys(contacts).forEach((contact) => {
+        return lastContacted$read(userId, contact.uid);
+      });
+
+      const lastContactedList = await Promise.all(promiseList);
     },
 
     async messages$fetch({ commit }, { userId, contactId }) {
@@ -104,7 +124,7 @@ export default new Vuex.Store({
         const messagesObj = messagesSnapshot.val();
         commit('messages$set', (messagesObj && Object.values(messagesObj)) || []);
       } catch (e) {
-        Vue.toasted.error(e && e.message);
+        Vue.toasted.info(`Failed fetching messages: ${e && e.message}`);
       }
     },
   },

@@ -9,7 +9,7 @@
         <i class="fa fa-instagram" aria-hidden="true"></i>
       </div>
     </div>
-    <div class="messages">
+    <div class="messages" ref="messagesContainer">
       <ul>
         <li :class="getClass(message)" v-for="message in messages" :key="message.time">
           <img :src="getImageUrl(message)" alt="" />
@@ -33,7 +33,12 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { messages$write, messages$on, messages$off } from '@/firebase/database.js';
+import {
+  messages$write,
+  messages$on,
+  messages$off,
+  lastContacted$write,
+} from '@/firebase/database.js';
 
 export default {
   data() {
@@ -41,7 +46,12 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ user: 'user', activeChat: 'activeChat', messages: 'messages' }),
+    ...mapGetters({
+      user: 'user',
+      activeChat: 'activeChat',
+      messages: 'messages',
+      contacts: 'contacts',
+    }),
     senderImageUrl() {
       return this.user.data && this.user.data.photoURL;
     },
@@ -59,6 +69,14 @@ export default {
       const time = date.getTime();
       messages$write(this.senderId, this.receiverId, this.message, time);
       this.message = '';
+
+      // set last contacted person
+      // remove previous last contacted person
+      this.contacts.forEach((contact) => {
+        lastContacted$write(this.senderId, contact.uid, false);
+      });
+      // set the new one
+      lastContacted$write(this.senderId, this.receiverId, true);
     },
 
     getTypeOfMessage(m) {
@@ -77,6 +95,13 @@ export default {
       if (type === 'sender') return this.senderImageUrl;
       else return this.activeChat.imageUrl;
     },
+
+    scrollToEnd() {
+      const messagesContainer = this.$refs.messagesContainer;
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    },
   },
 
   watch: {
@@ -92,6 +117,16 @@ export default {
         if (Object.keys(n).length)
           // first attatch event listener
           messages$on('child_added', this.senderId, n.uid);
+      },
+    },
+
+    messages: {
+      deep: true,
+      immediate: true,
+      async handler() {
+        // scroll to bottom
+        await this.$nextTick();
+        this.scrollToEnd();
       },
     },
   },
