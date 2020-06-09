@@ -21,11 +21,12 @@
     </div>
     <div class="message-input">
       <div class="wrap">
-        <input v-model="message" type="text" placeholder="Write your message..." />
-        <i class="fa fa-paperclip attachment" aria-hidden="true"></i>
-        <button class="submit">
-          <i class="fa fa-paper-plane" aria-hidden="true" @click.prevent="sendMessege"></i>
-        </button>
+        <form @submit.prevent="sendMessege">
+          <input v-model="message" type="text" placeholder="Write your message..." />
+          <button class="submit" type="submit">
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -65,18 +66,20 @@ export default {
 
   methods: {
     sendMessege() {
-      const date = new Date();
-      const time = date.getTime();
-      messages$write(this.senderId, this.receiverId, this.message, time);
-      this.message = '';
+      if (this.message) {
+        const date = new Date();
+        const time = date.getTime();
+        messages$write(this.senderId, this.receiverId, this.message, time);
+        this.message = '';
 
-      // set last contacted person
-      // remove previous last contacted person
-      this.contacts.forEach((contact) => {
-        lastContacted$write(this.senderId, contact.uid, false);
-      });
-      // set the new one
-      lastContacted$write(this.senderId, this.receiverId, true);
+        // set last contacted person
+        // remove previous last contacted person
+        this.contacts.forEach((contact) => {
+          lastContacted$write(this.senderId, contact.uid, false);
+        });
+        // set the new one
+        lastContacted$write(this.senderId, this.receiverId, true);
+      }
     },
 
     getTypeOfMessage(m) {
