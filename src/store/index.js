@@ -1,12 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {
-  users$read,
-  user$read,
-  contactList$read,
-  lastContacted$read,
-  messages$read,
-} from '@/firebase/database.js';
+import { users$read, user$read, contactList$read, messages$read } from '@/firebase/database.js';
 
 Vue.use(Vuex);
 
@@ -19,6 +13,7 @@ export default new Vuex.Store({
 
     allUsers: [],
     contacts: [],
+    lastContacted: '',
 
     activeChat: {},
     messages: [],
@@ -33,6 +28,9 @@ export default new Vuex.Store({
     },
     contacts(state) {
       return state.contacts || [];
+    },
+    lastContacted(state) {
+      return state.lastContacted || '';
     },
 
     activeChat(state) {
@@ -63,6 +61,9 @@ export default new Vuex.Store({
     contacts$set(state, contacts) {
       state.contacts = contacts;
     },
+    lastContacted$set(state, lastContacted) {
+      state.lastContacted = lastContacted;
+    },
 
     activeChat$set(state, activeChat) {
       state.activeChat = activeChat;
@@ -91,6 +92,12 @@ export default new Vuex.Store({
         const contactsSnapShot = await contactList$read(userId);
         const contacts = contactsSnapShot.val();
 
+        // set last contacted id
+        const lastContacted = Object.keys(contacts).find(
+          (contactKey) => contacts[contactKey].status && contacts[contactKey].lastContacted
+        );
+        commit('lastContacted$set', lastContacted);
+
         const promiseList = Object.keys(contacts)
           .filter((contactKey) => contacts[contactKey].status)
           .map((contactKey) => {
@@ -103,19 +110,12 @@ export default new Vuex.Store({
           contactsWithInfo.map((contact) => contact.val())
         );
       } catch (e) {
+        console.log(e);
         commit('contacts$set', []);
         Vue.toasted.info(
           'Your contact list is empty, please click the Add Contacts button to add contacts'
         );
       }
-    },
-
-    async lastContacted$fetch({ commit }, { userId, contacts }) {
-      const promiseList = Object.keys(contacts).forEach((contact) => {
-        return lastContacted$read(userId, contact.uid);
-      });
-
-      const lastContactedList = await Promise.all(promiseList);
     },
 
     async messages$fetch({ commit }, { userId, contactId }) {

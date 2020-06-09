@@ -36,7 +36,12 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ user: 'user', contacts: 'contacts', activeChat: 'activeChat' }),
+    ...mapGetters({
+      user: 'user',
+      contacts: 'contacts',
+      activeChat: 'activeChat',
+      lastContacted: 'lastContacted',
+    }),
     userData() {
       return this.user.data || {};
     },
@@ -52,12 +57,14 @@ export default {
   },
 
   async created() {
-    this.contacts$fetch({ userId: this.userData.uid });
+    await this.contacts$fetch({ userId: this.userData.uid });
+    this.setActiveChat(this.contacts.find((contact) => contact.uid === this.lastContacted));
   },
 
   methods: {
     ...mapActions({ contacts$fetch: 'contacts$fetch' }),
     setActiveChat(contact) {
+      console.log(contact);
       this.$store.commit('activeChat$set', contact);
     },
   },

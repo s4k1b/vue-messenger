@@ -20,8 +20,8 @@ async function user$read(userId) {
 function contacts$write(userId, contactId) {
   firebase
     .database()
-    .ref('users/' + userId + '/contacts/' + contactId + '/status')
-    .set(true);
+    .ref('users/' + userId + '/contacts/' + contactId)
+    .set({ status: true, lastContacted: false, uid: contactId });
 }
 
 async function contactList$read(userId) {
