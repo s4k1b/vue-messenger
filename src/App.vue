@@ -8,6 +8,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import { currentUserState } from '@/firebase/auth.js';
+import { user$setToken } from '@/firebase/database.js';
+import firebase from 'firebase/app';
+import 'firebase/messaging';
 
 export default {
   name: 'App',
@@ -16,13 +19,48 @@ export default {
     Authenticate: () => import('@/components/Authenticate'),
   },
 
+  data() {
+    return {
+      messaging: firebase.messaging(),
+    };
+  },
+
   computed: {
     ...mapGetters({ user: 'user' }),
   },
 
-  beforeCreate() {
+  created() {
     // get and set current user state
     currentUserState();
+
+    this.getAndSetToken();
+
+    // add listener for refreshing and getting token
+    this.addListenerToRefreshToken();
+  },
+
+  methods: {
+    async getAndSetToken() {
+      try {
+        // request permission to allow notification
+        await this.messaging.requestPermission();
+
+        // request to get token
+        const token = await this.messaging.getToken();
+        // send token to database
+        console.log(this.user);
+        user$setToken(this.user && this.user.data && this.user.data.uid, token);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    addListenerToRefreshToken() {
+      try {
+        this.messaging.onTokenRefresh(this.getToken);
+      } catch (e) {
+        console.log(e);
+      }
+    },
   },
 };
 </script>

@@ -17,6 +17,13 @@ async function user$read(userId) {
   return await firebase.database().ref(`/users/${userId}/info`).once('value');
 }
 
+async function user$setToken(userId, token) {
+  firebase
+    .database()
+    .ref('users/' + userId + '/token')
+    .set(token);
+}
+
 function contacts$write(userId, contactId) {
   firebase
     .database()
@@ -78,6 +85,7 @@ export {
   setUserData,
   users$read,
   user$read,
+  user$setToken,
   contacts$write,
   contactList$read,
   lastContacted$write,

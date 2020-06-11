@@ -3,6 +3,7 @@ import App from './App.vue';
 import './registerServiceWorker';
 import store from './store';
 import firebase from 'firebase/app';
+import 'firebase/messaging';
 
 Vue.config.productionTip = false;
 
@@ -18,6 +19,12 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+firebase
+  .messaging()
+  .usePublicVapidKey(
+    'BBIOTN74z7Ltwj4mg5qV6jxOj7ultrDYuETqQX51dH4P5rOEGC6kjEA3gnGlQVr7p5i2-6H6m9Sl5R72XTnaP_c'
+  );
 
 import Toasted from 'vue-toasted';
 Vue.use(Toasted, {

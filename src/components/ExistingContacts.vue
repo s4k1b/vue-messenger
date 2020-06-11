@@ -64,7 +64,6 @@ export default {
   methods: {
     ...mapActions({ contacts$fetch: 'contacts$fetch' }),
     setActiveChat(contact) {
-      console.log(contact);
       this.$store.commit('activeChat$set', contact);
     },
   },
