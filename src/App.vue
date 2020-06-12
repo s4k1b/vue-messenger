@@ -8,7 +8,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { currentUserState } from '@/firebase/auth.js';
-import { user$setToken } from '@/firebase/database.js';
+import { user$setToken, user$getToken } from '@/firebase/database.js';
 import firebase from 'firebase/app';
 import 'firebase/messaging';
 
@@ -33,10 +33,20 @@ export default {
     // get and set current user state
     currentUserState();
 
-    this.getAndSetToken();
-
     // add listener for refreshing and getting token
     this.addListenerToRefreshToken();
+
+    // add listener to handle message receiving of push message
+    this.addListenerToReceiveAndHandleNewMessage();
+  },
+
+  watch: {
+    user: {
+      deep: true,
+      handler() {
+        this.getAndSetToken();
+      },
+    },
   },
 
   methods: {
@@ -47,9 +57,14 @@ export default {
 
         // request to get token
         const token = await this.messaging.getToken();
+
         // send token to database
-        console.log(this.user);
-        user$setToken(this.user && this.user.data && this.user.data.uid, token);
+        // get previous token
+        const prevToken = await user$getToken(this.user && this.user.data && this.user.data.uid);
+        if (prevToken !== token) {
+          // if token changed then set token
+          user$setToken(this.user && this.user.data && this.user.data.uid, token);
+        }
       } catch (e) {
         console.log(e);
       }
@@ -60,6 +75,13 @@ export default {
       } catch (e) {
         console.log(e);
       }
+    },
+
+    handleMessage(payload) {
+      console.log('onMessage', payload.data);
+    },
+    addListenerToReceiveAndHandleNewMessage() {
+      this.messaging.onMessage(this.handleMessage);
     },
   },
 };
