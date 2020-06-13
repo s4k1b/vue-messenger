@@ -54,7 +54,6 @@ async function lastContacted$read(userId, contactId) {
 }
 
 function messages$write(senderId, receiverId, message, time) {
-  debugger;
   const identifier = [senderId, receiverId].sort().join('-');
   firebase
     .database()
@@ -91,6 +90,18 @@ function messages$off() {
   ref.off();
 }
 
+async function lastMessage$read(userId, contactId) {
+  const identifier = [userId, contactId].sort().join('-');
+  console.log(identifier);
+  return await firebase
+    .database()
+    .ref('/messages')
+    .orderByChild('identifier')
+    .equalTo(identifier)
+    .limitToLast(1)
+    .once('value');
+}
+
 export {
   setUserData,
   users$read,
@@ -105,4 +116,5 @@ export {
   messages$read,
   messages$on,
   messages$off,
+  lastMessage$read,
 };

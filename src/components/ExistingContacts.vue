@@ -18,7 +18,7 @@
             <img :src="contact.imageUrl" alt="" />
             <div class="meta">
               <p class="name">{{ contact.name }}</p>
-              <p class="preview">No messages yet</p>
+              <last-message :contact="contact" />
             </div>
           </div>
         </li>
@@ -29,7 +29,10 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import LastMessage from '@/components/LastMessage';
+
 export default {
+  components: { LastMessage },
   data() {
     return {
       searchText: '',
