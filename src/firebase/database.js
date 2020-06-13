@@ -54,6 +54,7 @@ async function lastContacted$read(userId, contactId) {
 }
 
 function messages$write(senderId, receiverId, message, time) {
+  debugger;
   const identifier = [senderId, receiverId].sort().join('-');
   firebase
     .database()
@@ -74,13 +75,15 @@ async function messages$read(userId, contactId) {
 }
 
 function messages$on(event, userId, contactId) {
+  const identifier = [userId, contactId].sort().join('-');
   const ref = firebase.database().ref('/messages');
-  ref.on(event, (data) => {
-    const value = data.val();
-    if (value.senderId === userId || value.receiverId === userId) {
+  ref
+    .orderByChild('identifier')
+    .equalTo(identifier)
+    .limitToLast(50)
+    .on(event, () => {
       Store.dispatch('messages$fetch', { userId, contactId });
-    }
-  });
+    });
 }
 
 function messages$off() {
