@@ -27,26 +27,20 @@ export default {
 
   computed: {
     ...mapGetters({ user: 'user' }),
+    userId() {
+      return this.user.data && this.user.data.uid;
+    },
   },
 
   created() {
-    // get and set current user state
-    currentUserState();
+    // get and set current user state and token
+    currentUserState(this.getAndSetToken);
 
     // add listener for refreshing and getting token
     this.addListenerToRefreshToken();
 
     // add listener to handle message receiving of push message
     this.addListenerToReceiveAndHandleNewMessage();
-  },
-
-  watch: {
-    user: {
-      deep: true,
-      handler() {
-        this.getAndSetToken();
-      },
-    },
   },
 
   methods: {
@@ -60,10 +54,10 @@ export default {
 
         // send token to database
         // get previous token
-        const prevToken = await user$getToken(this.user && this.user.data && this.user.data.uid);
+        const prevToken = this.userId ? await user$getToken(this.userId) : '';
         if (prevToken !== token) {
           // if token changed then set token
-          user$setToken(this.user && this.user.data && this.user.data.uid, token);
+          if (this.userId) user$setToken(this.userId, token);
         }
       } catch (e) {
         console.log(e);

@@ -27,10 +27,11 @@ async function userSignOut() {
   }
 }
 
-function currentUserState() {
+function currentUserState(getAndSetToken) {
   firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       store.commit('user$set', { loggedIn: true, data: user });
+      getAndSetToken();
     } else {
       store.commit('user$set', { loggedIn: false, data: {} });
     }

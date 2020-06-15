@@ -1,9 +1,12 @@
 importScripts('https://www.gstatic.com/firebasejs/7.15.0/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js');
 
-// self.__precacheManifest = [].concat(self.__precacheManifest || []);
-// workbox.precaching.suppressWarnings();
-// workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.setConfig({
+  debug: true,
+});
+// actually caches our manifest and public assets
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 // workbox.routing.registerRoute(
 //   new RegExp('https://firebasestorage.googleapis.com/v0/b/cropchien.appspot.com/.*'),
@@ -26,10 +29,13 @@ const messaging = firebase.messaging();
 // background (Web app is closed or not in browser focus) then you should
 // implement this optional method.
 // [START background_handler]
+let click_open_url;
+
 messaging.setBackgroundMessageHandler(function (payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
   const { data } = payload;
+  click_open_url = data.click_action;
   // Customize notification here
   const notificationTitle = data.title;
   const notificationOptions = {
@@ -38,4 +44,28 @@ messaging.setBackgroundMessageHandler(function (payload) {
   };
 
   return self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// add click notification handler
+self.addEventListener('notificationclick', function (e) {
+  const clickedNotification = e.notification;
+  // close the notification
+  clickedNotification.close();
+  if (click_open_url) {
+    const promiseChain = clients
+      .matchAll({
+        type: 'window',
+      })
+      // get all open widnows in browser
+      .then((clientList) => {
+        // iterate throw all the windows to find the desired url
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url === click_open_url && 'focus' in client) return client.focus();
+        }
+        // if not found open new window with desired url
+        if (clients.openWindow) return clients.openWindow(click_open_url);
+      });
+    e.waitUntil(promiseChain);
+  }
 });
