@@ -1,5 +1,5 @@
 <template>
-  <p class="preview">{{ lastMessage }}</p>
+  <p class="preview">{{ lastMessage || contact.email }}</p>
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
 
   data() {
     return {
-      lastMessage: 'No messages yet',
+      lastMessage: '',
     };
   },
 
@@ -30,23 +30,37 @@ export default {
     },
   },
 
-  created() {
+  mounted() {
     this.fetchLastMessage();
+  },
+
+  watch: {
+    userId() {
+      this.fetchLastMessage();
+    },
+    contactId() {
+      this.fetchLastMessage();
+    },
   },
 
   methods: {
     async fetchLastMessage() {
-      try {
-        const messageSnapshot = await lastMessage$read(this.userId, this.contactId);
-        const message = messageSnapshot.val();
-        const lastMessageObj = Object.values(message)[0];
-        this.lastMessage = lastMessageObj.message;
+      console.log('hi');
+      if (this.userId && this.contactId) {
+        console.log('hi2');
+        try {
+          const messageSnapshot = await lastMessage$read(this.userId, this.contactId);
+          console.log(messageSnapshot);
+          const message = messageSnapshot.val();
+          const lastMessageObj = Object.values(message)[0];
+          this.lastMessage = lastMessageObj.message;
 
-        if (lastMessageObj.senderId === this.userId) {
-          this.lastMessage = `Me: ${this.lastMessage}`;
+          if (lastMessageObj.senderId === this.userId) {
+            this.lastMessage = `Me: ${this.lastMessage}`;
+          }
+        } catch (e) {
+          console.log(e);
         }
-      } catch (e) {
-        console.log(e);
       }
     },
   },

@@ -92,7 +92,6 @@ function messages$off() {
 
 async function lastMessage$read(userId, contactId) {
   const identifier = [userId, contactId].sort().join('-');
-  console.log(identifier);
   return await firebase
     .database()
     .ref('/messages')
